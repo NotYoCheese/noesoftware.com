@@ -1,0 +1,116 @@
+---
+import { getCollection } from 'astro:content';
+import BaseHead from '../../components/BaseHead.astro';
+import Footer from '../../components/Footer.astro';
+import FormattedDate from '../../components/FormattedDate.astro';
+import Header from '../../components/Header.astro';
+import { SITE_DESCRIPTION, SITE_TITLE } from '../../consts';
+
+const caseStudies = (await getCollection('caseStudies')).sort(
+	(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
+);
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<BaseHead title={`Case Studies | ${SITE_TITLE}`} description={SITE_DESCRIPTION} />
+		<style>
+			main {
+				width: 960px;
+			}
+			.page-title {
+				text-align: center;
+				margin-bottom: 2rem;
+			}
+			.case-studies {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 2rem;
+				list-style-type: none;
+				margin: 0;
+				padding: 0;
+			}
+			.case-studies li {
+				width: 100%;
+			}
+			.card {
+				display: block;
+				padding: 1.5em;
+				border-radius: 12px;
+				background: white;
+				box-shadow: var(--box-shadow);
+				text-decoration: none;
+				transition: transform 0.2s ease, box-shadow 0.2s ease;
+			}
+			.card:hover {
+				transform: translateY(-2px);
+				box-shadow: 0 4px 12px rgba(var(--gray), 40%);
+			}
+			.card h3 {
+				margin: 0 0 0.5em 0;
+				color: rgb(var(--black));
+				line-height: 1.2;
+			}
+			.card p {
+				color: rgb(var(--gray-dark));
+				margin: 0 0 0.75em 0;
+				line-height: 1.5;
+			}
+			.card .date {
+				color: rgb(var(--gray));
+				font-size: 0.85em;
+			}
+			.tags {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 0.4em;
+				margin-top: 0.75em;
+			}
+			.tag {
+				background-color: rgb(var(--gray-light));
+				color: rgb(var(--gray-dark));
+				padding: 0.2em 0.6em;
+				border-radius: 999px;
+				font-size: 0.75em;
+			}
+			@media (max-width: 720px) {
+				.case-studies {
+					gap: 1rem;
+				}
+				.card {
+					padding: 1em;
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<Header />
+		<main>
+			<h1 class="page-title">Case Studies</h1>
+			<ul class="case-studies">
+				{
+					caseStudies.map((study) => (
+						<li>
+							<a href={`/case-studies/${study.id}/`} class="card">
+								<h3>{study.data.title}</h3>
+								<p>{study.data.description}</p>
+								<span class="date">
+									<FormattedDate date={study.data.pubDate} />
+								</span>
+								{study.data.tags && study.data.tags.length > 0 && (
+									<div class="tags">
+										{study.data.tags.map((tag: string) => (
+											<span class="tag">{tag}</span>
+										))}
+									</div>
+								)}
+							</a>
+						</li>
+					))
+				}
+			</ul>
+		</main>
+		<Footer />
+	</body>
+</html>
